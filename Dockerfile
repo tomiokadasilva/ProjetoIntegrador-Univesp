@@ -5,7 +5,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Install system dependencies required for mysqlclient (if needed, though pymysql is used)
-# RUN apt-get update && apt-get install -y --no-install-recommends default-libmysqlclient-dev build-essential && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
 # Copy the requirements file into the container at /app
 COPY requirements.txt .
@@ -15,6 +15,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the application source code into the container at /app
 COPY ./src /app/src
+
+# Copy the entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+
+# Make the entrypoint script executable
+RUN chmod +x /app/entrypoint.sh
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
@@ -29,6 +35,6 @@ ENV DB_USERNAME=root
 ENV DB_PASSWORD=password
 ENV SECRET_KEY=default_secret_key_change_me
 
-# Run the application using Gunicorn
+# Run the application using the entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "src.main:app"]
-
