@@ -445,30 +445,24 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Global variables
-        let currentUser = null;
-        let token = null;
+            // Global variables (Auth related removed)
         const apiBaseUrl = '/api';
         
-        // DOM Elements
-        const loginPage = document.getElementById('login-page');
+        // DOM Elements (Auth/User related removed)
         const appPage = document.getElementById('app');
         const dashboardPage = document.getElementById('dashboard-page');
         const customersPage = document.getElementById('customers-page');
         const alertsPage = document.getElementById('alerts-page');
-        const usersPage = document.getElementById('users-page');
+        // const usersPage = document.getElementById('users-page'); // Removed
         
-        // Modals
+        // Modals (User modal removed)
         const customerModal = new bootstrap.Modal(document.getElementById('customer-modal'));
-        const userModal = new bootstrap.Modal(document.getElementById('user-modal'));
+        // const userModal = new bootstrap.Modal(document.getElementById('user-modal')); // Removed
         const deleteModal = new bootstrap.Modal(document.getElementById('delete-modal'));
         
-        // Event Listeners
-        document.getElementById('login-form').addEventListener('submit', handleLogin);
-        // Removido o listener do formulário de registro que não existe mais
-        document.getElementById('logout-btn').addEventListener('click', handleLogout);
+        // Event Listeners (Auth/User related removed)
+        // document.getElementById('login-form').addEventListener('submit', handleLogin); // Removed
+        // document.getElementById('logout-btn').addEventListener('click', handleLogout); // Removed
         
         // Navegação principal
         document.getElementById('dashboard-link').addEventListener('click', function(e) {
@@ -486,138 +480,43 @@
             showAlerts();
         });
         
-        document.getElementById('users-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            showUsers();
-        });
+        // document.getElementById('users-link').addEventListener('click', function(e) { // Removed
+        //     e.preventDefault();
+        //     showUsers();
+        // });
         
-        // Outros botões
+        // Outros botões (User related removed)
         document.getElementById('add-customer-btn').addEventListener('click', showAddCustomerModal);
-        document.getElementById('add-user-btn').addEventListener('click', showAddUserModal);
+        // document.getElementById('add-user-btn').addEventListener('click', showAddUserModal); // Removed
         document.getElementById('save-customer-btn').addEventListener('click', saveCustomer);
-        document.getElementById('save-user-btn').addEventListener('click', saveUser);
+        // document.getElementById('save-user-btn').addEventListener('click', saveUser); // Removed
         document.getElementById('apply-filters-btn').addEventListener('click', loadCustomers);
         document.getElementById('clear-filters-btn').addEventListener('click', clearCustomerFilters);
         document.getElementById('apply-alert-filters-btn').addEventListener('click', loadAlerts);
         document.getElementById('clear-alert-filters-btn').addEventListener('click', clearAlertFilters);
         
-        // Check for existing token in localStorage
+        // Initialize the application directly (no login check)
         function initApp() {
-            token = localStorage.getItem('token');
-            if (token) {
-                fetchCurrentUser()
-                    .then(() => {
-                        showApp();
-                        showDashboard();
-                        // Check for notifications on app init
-                        checkNotifications();
-                    })
-                    .catch(() => {
-                        // Token invalid or expired
-                        localStorage.removeItem('token');
-                        showLogin();
-                    });
-            } else {
-                showLogin();
-            }
+            showDashboard(); // Show dashboard by default
+            checkNotifications(); // Check notifications on load
         }
         
-        // Authentication Functions
-        async function handleLogin(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            try {
-                const response = await fetch(`${apiBaseUrl}/auth/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Falha no login');
-                }
-                
-                const data = await response.json();
-                token = data.token;
-                currentUser = data.user;
-                
-                // Save token to localStorage
-                localStorage.setItem('token', token);
-                
-                // Show app
-                showApp();
-                showDashboard();
-                
-            } catch (error) {
-                document.getElementById('login-error').classList.remove('d-none');
-            }
-        }
+        // Authentication Functions Removed
+        // async function handleLogin(e) { ... }
+        // function handleLogout() { ... }
+        // async function fetchCurrentUser() { ... }
         
-        function handleLogout() {
-            // Clear token and user data
-            localStorage.removeItem('token');
-            token = null;
-            currentUser = null;
-            
-            // Show login page
-            showLogin();
-        }
-        
-        async function fetchCurrentUser() {
-            const response = await fetch(`${apiBaseUrl}/auth/profile`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error('Failed to fetch user profile');
-            }
-            
-            const data = await response.json();
-            currentUser = data.user;
-            updateUserInfo();
-        }
-        
-        // UI Functions
-        function showLogin() {
-            loginPage.classList.remove('d-none');
-            appPage.classList.add('d-none');
-            document.getElementById('login-form').reset();
-            document.getElementById('login-error').classList.add('d-none');
-        }
-        
-        function showApp() {
-            loginPage.classList.add('d-none');
-            appPage.classList.remove('d-none');
-            updateUserInfo();
-            updateAdminElements();
-        }
-        
-        function updateUserInfo() {
-            if (currentUser) {
-                document.getElementById('user-info').textContent = `Bem-vindo, ${currentUser.username}`;
-            }
-        }
-        
-        function updateAdminElements() {
-            const adminElements = document.querySelectorAll('.admin-only');
-            if (currentUser && currentUser.is_admin) {
-                adminElements.forEach(el => el.classList.remove('d-none'));
-            } else {
-                adminElements.forEach(el => el.classList.add('d-none'));
-            }
-        }
+        // UI Functions (Auth/User related removed or simplified)
+        // function showLogin() { ... } // Removed
+        // function showApp() { ... } // Removed (app is shown by default)
+        // function updateUserInfo() { ... } // Removed
+        // function updateAdminElements() { ... } // Removed
         
         function showDashboard() {
             dashboardPage.classList.remove('d-none');
             customersPage.classList.add('d-none');
             alertsPage.classList.add('d-none');
-            usersPage.classList.add('d-none');
+            // usersPage.classList.add('d-none'); // Removed
             
             loadDashboardData();
         }
@@ -626,7 +525,7 @@
             dashboardPage.classList.add('d-none');
             customersPage.classList.remove('d-none');
             alertsPage.classList.add('d-none');
-            usersPage.classList.add('d-none');
+            // usersPage.classList.add('d-none'); // Removed
             
             loadCustomers();
         }
@@ -635,29 +534,18 @@
             dashboardPage.classList.add('d-none');
             customersPage.classList.add('d-none');
             alertsPage.classList.remove('d-none');
-            usersPage.classList.add('d-none');
+            // usersPage.classList.add('d-none'); // Removed
             
             loadAlerts();
         }
         
-        function showUsers() {
-            dashboardPage.classList.add('d-none');
-            customersPage.classList.add('d-none');
-            alertsPage.classList.add('d-none');
-            usersPage.classList.remove('d-none');
-            
-            loadUsers();
-        }
+        // function showUsers() { ... } // Removed
         
-        // Data Loading Functions
+        // Data Loading Functions (Removed Authorization headers)
         async function loadDashboardData() {
             try {
                 // Load summary data
-                const summaryResponse = await fetch(`${apiBaseUrl}/alerts/summary`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                const summaryResponse = await fetch(`${apiBaseUrl}/alerts/summary`); // Removed headers
                 
                 if (!summaryResponse.ok) {
                     throw new Error('Failed to load summary data');
@@ -672,11 +560,7 @@
                 document.getElementById('due-30days').textContent = summaryData.maintenance_due_30days;
                 
                 // Load recent alerts
-                const alertsResponse = await fetch(`${apiBaseUrl}/alerts?days_threshold=30`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                const alertsResponse = await fetch(`${apiBaseUrl}/alerts?days_threshold=30`); // Removed headers
                 
                 if (!alertsResponse.ok) {
                     throw new Error('Failed to load alerts');
@@ -690,7 +574,7 @@
                 
                 if (alertsData.alerts.length === 0) {
                     const row = document.createElement('tr');
-                    row.innerHTML = '<td colspan="5" class="text-center">No alerts found</td>';
+                    row.innerHTML = '<td colspan="5" class="text-center">Nenhum alerta encontrado</td>'; // Translated
                     alertsTable.appendChild(row);
                 } else {
                     // Show only the first 5 alerts
@@ -705,8 +589,8 @@
                             <td>${alert.customer_phone}</td>
                             <td>${alert.installation_date}</td>
                             <td>${alert.maintenance_date}</td>
-                            <td class="${statusClass}">${alert.status}</td>
-                        `;
+                            <td class="${statusClass}">${alert.status === 'Overdue' ? 'Atrasado' : 'Em breve'}</td>
+                        `; // Translated status
                         
                         alertsTable.appendChild(row);
                     });
@@ -733,11 +617,7 @@
                 const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
                 
                 // Fetch customers
-                const response = await fetch(`${apiBaseUrl}/customers${queryString}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                const response = await fetch(`${apiBaseUrl}/customers${queryString}`); // Removed headers
                 
                 if (!response.ok) {
                     throw new Error('Failed to load customers');
@@ -751,7 +631,7 @@
                 
                 if (data.customers.length === 0) {
                     const row = document.createElement('tr');
-                    row.innerHTML = '<td colspan="5" class="text-center">No customers found</td>';
+                    row.innerHTML = '<td colspan="5" class="text-center">Nenhum cliente encontrado</td>'; // Translated
                     customersTable.appendChild(row);
                 } else {
                     data.customers.forEach(customer => {
@@ -763,34 +643,26 @@
                             <td>${customer.phone}</td>
                             <td>${customer.installation_date}</td>
                             <td>
-                                <button class="btn btn-sm btn-primary edit-customer" data-id="${customer.id}">Edit</button>
-                                <button class="btn btn-sm btn-danger delete-customer" data-id="${customer.id}">Delete</button>
+                                <button class="btn btn-sm btn-primary edit-customer" data-id="${customer.id}">Editar</button>
+                                <button class="btn btn-sm btn-danger delete-customer" data-id="${customer.id}">Excluir</button>
                             </td>
-                        `;
+                        `; // Translated buttons
                         
                         customersTable.appendChild(row);
                     });
                     
-                    // Add event listeners to buttons
-                    document.querySelectorAll('.edit-customer').forEach(btn => {
-                        btn.addEventListener('click', () => showEditCustomerModal(btn.dataset.id));
+                    // Add event listeners to edit/delete buttons
+                    document.querySelectorAll('.edit-customer').forEach(button => {
+                        button.addEventListener('click', (e) => showEditCustomerModal(e.target.dataset.id));
                     });
-                    
-                    document.querySelectorAll('.delete-customer').forEach(btn => {
-                        btn.addEventListener('click', () => showDeleteCustomerModal(btn.dataset.id));
+                    document.querySelectorAll('.delete-customer').forEach(button => {
+                        button.addEventListener('click', (e) => showDeleteModal('customer', e.target.dataset.id));
                     });
                 }
                 
             } catch (error) {
                 console.error('Error loading customers:', error);
             }
-        }
-        
-        function clearCustomerFilters() {
-            document.getElementById('name-filter').value = '';
-            document.getElementById('start-date-filter').value = '';
-            document.getElementById('end-date-filter').value = '';
-            loadCustomers();
         }
         
         async function loadAlerts() {
@@ -801,19 +673,14 @@
                 const endDate = document.getElementById('alert-end-date').value;
                 
                 // Build query string
-                let queryParams = [];
-                if (daysThreshold) queryParams.push(`days_threshold=${daysThreshold}`);
+                let queryParams = [`days_threshold=${daysThreshold}`];
                 if (startDate) queryParams.push(`start_date=${startDate}`);
                 if (endDate) queryParams.push(`end_date=${endDate}`);
                 
-                const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+                const queryString = `?${queryParams.join('&')}`;
                 
                 // Fetch alerts
-                const response = await fetch(`${apiBaseUrl}/alerts${queryString}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                const response = await fetch(`${apiBaseUrl}/alerts${queryString}`); // Removed headers
                 
                 if (!response.ok) {
                     throw new Error('Failed to load alerts');
@@ -827,7 +694,7 @@
                 
                 if (data.alerts.length === 0) {
                     const row = document.createElement('tr');
-                    row.innerHTML = '<td colspan="6" class="text-center">No alerts found</td>';
+                    row.innerHTML = '<td colspan="6" class="text-center">Nenhum alerta encontrado</td>'; // Translated
                     alertsTable.appendChild(row);
                 } else {
                     data.alerts.forEach(alert => {
@@ -840,8 +707,8 @@
                             <td>${alert.installation_date}</td>
                             <td>${alert.maintenance_date}</td>
                             <td>${alert.days_until_maintenance}</td>
-                            <td class="${statusClass}">${alert.status}</td>
-                        `;
+                            <td class="${statusClass}">${alert.status === 'Overdue' ? 'Atrasado' : 'Em breve'}</td>
+                        `; // Translated status
                         
                         alertsTable.appendChild(row);
                     });
@@ -852,6 +719,132 @@
             }
         }
         
+        // async function loadUsers() { ... } // Removed
+        
+        // CRUD Functions (Removed Authorization headers, User functions removed)
+        function showAddCustomerModal() {
+            document.getElementById('customer-form').reset();
+            document.getElementById('customer-id').value = '';
+            document.getElementById('customer-modal-title').textContent = 'Adicionar Novo Cliente';
+            customerModal.show();
+        }
+        
+        async function showEditCustomerModal(customerId) {
+            try {
+                const response = await fetch(`${apiBaseUrl}/customers/${customerId}`); // Removed headers
+                if (!response.ok) {
+                    throw new Error('Failed to fetch customer details');
+                }
+                const data = await response.json();
+                const customer = data.customer;
+                
+                document.getElementById('customer-id').value = customer.id;
+                document.getElementById('customer-name').value = customer.name;
+                document.getElementById('customer-address').value = customer.address;
+                document.getElementById('customer-phone').value = customer.phone;
+                document.getElementById('customer-installation-date').value = customer.installation_date;
+                document.getElementById('customer-alert-days').value = customer.alert_days;
+                
+                document.getElementById('customer-modal-title').textContent = 'Editar Cliente';
+                customerModal.show();
+                
+            } catch (error) {
+                console.error('Error fetching customer details:', error);
+            }
+        }
+        
+        async function saveCustomer() {
+            const customerId = document.getElementById('customer-id').value;
+            const customerData = {
+                name: document.getElementById('customer-name').value,
+                address: document.getElementById('customer-address').value,
+                phone: document.getElementById('customer-phone').value,
+                installation_date: document.getElementById('customer-installation-date').value,
+                alert_days: parseInt(document.getElementById('customer-alert-days').value, 10)
+            };
+            
+            const url = customerId ? `${apiBaseUrl}/customers/${customerId}` : `${apiBaseUrl}/customers`;
+            const method = customerId ? 'PUT' : 'POST';
+            
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // Removed Authorization header
+                    },
+                    body: JSON.stringify(customerData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to save customer');
+                }
+                
+                customerModal.hide();
+                loadCustomers(); // Reload the customer list
+                
+            } catch (error) {
+                console.error('Error saving customer:', error);
+                alert(`Erro ao salvar cliente: ${error.message}`); // Show error to user
+            }
+        }
+        
+        // function showAddUserModal() { ... } // Removed
+        // async function showEditUserModal(userId) { ... } // Removed
+        // async function saveUser() { ... } // Removed
+        
+        function showDeleteModal(type, id) {
+            const message = type === 'customer' ? 'Tem certeza que deseja excluir este cliente?' : 'Tem certeza que deseja excluir este usuário?';
+            document.getElementById('delete-message').textContent = message;
+            
+            const confirmBtn = document.getElementById('confirm-delete-btn');
+            // Clone and replace the button to remove previous listeners
+            const newConfirmBtn = confirmBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+            
+            newConfirmBtn.addEventListener('click', () => deleteItem(type, id));
+            
+            deleteModal.show();
+        }
+        
+        async function deleteItem(type, id) {
+            const url = type === 'customer' ? `${apiBaseUrl}/customers/${id}` : `${apiBaseUrl}/users/${id}`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'DELETE'
+                    // Removed Authorization header
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to delete item');
+                }
+                
+                deleteModal.hide();
+                
+                // Reload the appropriate list
+                if (type === 'customer') {
+                    loadCustomers();
+                } else {
+                    // loadUsers(); // Removed
+                }
+                
+            } catch (error) {
+                console.error(`Error deleting ${type}:`, error);
+                alert(`Erro ao excluir ${type}: ${error.message}`); // Show error to user
+            }
+        }
+        
+        // Utility Functions
+        function clearCustomerFilters() {
+            document.getElementById('name-filter').value = '';
+            document.getElementById('start-date-filter').value = '';
+            document.getElementById('end-date-filter').value = '';
+            loadCustomers();
+        }
+        
         function clearAlertFilters() {
             document.getElementById('days-threshold').value = '30';
             document.getElementById('alert-start-date').value = '';
@@ -859,378 +852,82 @@
             loadAlerts();
         }
         
-        async function loadUsers() {
-            if (!currentUser || !currentUser.is_admin) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${apiBaseUrl}/users`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to load users');
-                }
-                
-                const data = await response.json();
-                
-                // Update users table
-                const usersTable = document.getElementById('users-table');
-                usersTable.innerHTML = '';
-                
-                if (data.users.length === 0) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = '<td colspan="5" class="text-center">No users found</td>';
-                    usersTable.appendChild(row);
-                } else {
-                    data.users.forEach(user => {
-                        const row = document.createElement('tr');
-                        
-                        row.innerHTML = `
-                            <td>${user.username}</td>
-                            <td>${user.email}</td>
-                            <td>${user.is_admin ? 'Admin' : 'User'}</td>
-                            <td>${user.created_at}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary edit-user" data-id="${user.id}">Edit</button>
-                                <button class="btn btn-sm btn-danger delete-user" data-id="${user.id}">Delete</button>
-                            </td>
-                        `;
-                        
-                        usersTable.appendChild(row);
-                    });
-                    
-                    // Add event listeners to buttons
-                    document.querySelectorAll('.edit-user').forEach(btn => {
-                        btn.addEventListener('click', () => showEditUserModal(btn.dataset.id));
-                    });
-                    
-                    document.querySelectorAll('.delete-user').forEach(btn => {
-                        btn.addEventListener('click', () => showDeleteUserModal(btn.dataset.id));
-                    });
-                }
-                
-            } catch (error) {
-                console.error('Error loading users:', error);
+        // Notification Bell Logic
+        const notificationBell = document.getElementById('notification-bell');
+        const notificationBadge = document.getElementById('notification-badge');
+        const notificationCount = document.getElementById('notification-count');
+        const notificationDropdown = document.getElementById('notification-dropdown');
+        const notificationList = document.getElementById('notification-list');
+        let notificationDropdownInstance = null;
+        
+        if (notificationBell) {
+            notificationDropdownInstance = new bootstrap.Dropdown(notificationBell);
+            notificationBell.addEventListener('click', toggleNotificationDropdown);
+        }
+        
+        function toggleNotificationDropdown(event) {
+            event.stopPropagation(); // Prevent default dropdown behavior if needed
+            if (notificationDropdown.classList.contains('d-none')) {
+                loadNotifications();
+                notificationDropdown.classList.remove('d-none');
+            } else {
+                notificationDropdown.classList.add('d-none');
             }
         }
         
-        // Customer Modal Functions
-        function showAddCustomerModal() {
-            document.getElementById('customer-modal-title').textContent = 'Add New Customer';
-            document.getElementById('customer-form').reset();
-            document.getElementById('customer-id').value = '';
-            
-            // Set today as default installation date
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('customer-installation-date').value = today;
-            
-            customerModal.show();
-        }
-        
-        async function showEditCustomerModal(customerId) {
-            try {
-                const response = await fetch(`${apiBaseUrl}/customers/${customerId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to load customer details');
-                }
-                
-                const data = await response.json();
-                const customer = data.customer;
-                
-                document.getElementById('customer-modal-title').textContent = 'Edit Customer';
-                document.getElementById('customer-id').value = customer.id;
-                document.getElementById('customer-name').value = customer.name;
-                document.getElementById('customer-address').value = customer.address;
-                document.getElementById('customer-phone').value = customer.phone;
-                document.getElementById('customer-installation-date').value = customer.installation_date;
-                
-                // Set alert days dropdown value
-                const alertDaysSelect = document.getElementById('customer-alert-days');
-                if (customer.alert_days) {
-                    // Find the option with matching value
-                    const option = Array.from(alertDaysSelect.options).find(opt => parseInt(opt.value) === customer.alert_days);
-                    if (option) {
-                        alertDaysSelect.value = option.value;
-                    } else {
-                        // Default to 30 days if no match
-                        alertDaysSelect.value = '30';
-                    }
-                } else {
-                    // Default to 30 days if not set
-                    alertDaysSelect.value = '30';
-                }
-                
-                customerModal.show();
-                
-            } catch (error) {
-                console.error('Error loading customer details:', error);
+        // Close dropdown if clicked outside
+        document.addEventListener('click', function(event) {
+            if (notificationDropdown && !notificationDropdown.classList.contains('d-none') && !notificationBell.contains(event.target) && !notificationDropdown.contains(event.target)) {
+                notificationDropdown.classList.add('d-none');
             }
-        }
+        });
         
-        async function saveCustomer() {
-            const customerId = document.getElementById('customer-id').value;
-            const isNewCustomer = !customerId;
-            
-            const customerData = {
-                name: document.getElementById('customer-name').value,
-                address: document.getElementById('customer-address').value,
-                phone: document.getElementById('customer-phone').value,
-                installation_date: document.getElementById('customer-installation-date').value,
-                alert_days: parseInt(document.getElementById('customer-alert-days').value)
-            };
-            
-            try {
-                let url = `${apiBaseUrl}/customers`;
-                let method = 'POST';
-                
-                if (!isNewCustomer) {
-                    url = `${apiBaseUrl}/customers/${customerId}`;
-                    method = 'PUT';
-                }
-                
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(customerData)
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to save customer');
-                }
-                
-                // Close modal and reload customers
-                customerModal.hide();
-                loadCustomers();
-                
-                // Reload dashboard if we're adding/editing a customer
-                if (document.getElementById('dashboard-page').classList.contains('d-none') === false) {
-                    loadDashboardData();
-                }
-                
-                // Check notifications after adding/editing a customer
-                checkNotifications();
-                
-            } catch (error) {
-                console.error('Error saving customer:', error);
-            }
-        }
-        
-        function showDeleteCustomerModal(customerId) {
-            document.getElementById('delete-message').textContent = 'Are you sure you want to delete this customer?';
-            
-            // Set up delete confirmation button
-            const confirmButton = document.getElementById('confirm-delete-btn');
-            confirmButton.onclick = async () => {
-                try {
-                    const response = await fetch(`${apiBaseUrl}/customers/${customerId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error('Failed to delete customer');
-                    }
-                    
-                    // Close modal and reload customers
-                    deleteModal.hide();
-                    loadCustomers();
-                    
-                    // Reload dashboard if we're on the dashboard
-                    if (document.getElementById('dashboard-page').classList.contains('d-none') === false) {
-                        loadDashboardData();
-                    }
-                    
-                } catch (error) {
-                    console.error('Error deleting customer:', error);
-                }
-            };
-            
-            deleteModal.show();
-        }
-        
-        // User Modal Functions
-        function showAddUserModal() {
-            document.getElementById('user-modal-title').textContent = 'Add New User';
-            document.getElementById('user-form').reset();
-            document.getElementById('user-id').value = '';
-            document.getElementById('password-hint').classList.add('d-none');
-            document.getElementById('user-password').required = true;
-            
-            userModal.show();
-        }
-        
-        async function showEditUserModal(userId) {
-            try {
-                const response = await fetch(`${apiBaseUrl}/users/${userId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to load user details');
-                }
-                
-                const data = await response.json();
-                const user = data.user;
-                
-                document.getElementById('user-modal-title').textContent = 'Edit User';
-                document.getElementById('user-id').value = user.id;
-                document.getElementById('user-username').value = user.username;
-                document.getElementById('user-email').value = user.email;
-                document.getElementById('user-is-admin').checked = user.is_admin;
-                document.getElementById('user-password').value = '';
-                document.getElementById('user-password').required = false;
-                document.getElementById('password-hint').classList.remove('d-none');
-                
-                userModal.show();
-                
-            } catch (error) {
-                console.error('Error loading user details:', error);
-            }
-        }
-        
-        async function saveUser() {
-            const userId = document.getElementById('user-id').value;
-            const isNewUser = !userId;
-            
-            const userData = {
-                username: document.getElementById('user-username').value,
-                email: document.getElementById('user-email').value,
-                is_admin: document.getElementById('user-is-admin').checked
-            };
-            
-            // Only include password if it's provided
-            const password = document.getElementById('user-password').value;
-            if (password) {
-                userData.password = password;
-            }
-            
-            try {
-                let url = `${apiBaseUrl}/auth/register`;
-                let method = 'POST';
-                
-                if (!isNewUser) {
-                    url = `${apiBaseUrl}/users/${userId}`;
-                    method = 'PUT';
-                }
-                
-                const response = await fetch(url, {
-                    method: method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify(userData)
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to save user');
-                }
-                
-                // Close modal and reload users
-                userModal.hide();
-                loadUsers();
-                
-            } catch (error) {
-                console.error('Error saving user:', error);
-            }
-        }
-        
-        function showDeleteUserModal(userId) {
-            document.getElementById('delete-message').textContent = 'Are you sure you want to delete this user?';
-            
-            // Set up delete confirmation button
-            const confirmButton = document.getElementById('confirm-delete-btn');
-            confirmButton.onclick = async () => {
-                try {
-                    const response = await fetch(`${apiBaseUrl}/users/${userId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error('Failed to delete user');
-                    }
-                    
-                    // Close modal and reload users
-                    deleteModal.hide();
-                    loadUsers();
-                    
-                } catch (error) {
-                    console.error('Error deleting user:', error);
-                }
-            };
-            
-            deleteModal.show();
-        }
-        
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', initApp);
-        
-        // Notification Functions
         async function checkNotifications() {
             try {
-                // Fetch alerts that are overdue or due within 2 days
-                const response = await fetch(`${apiBaseUrl}/alerts?days_threshold=2`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to load notifications');
-                }
-                
+                const response = await fetch(`${apiBaseUrl}/alerts?days_threshold=2`); // Check alerts due in 2 days or overdue
+                if (!response.ok) throw new Error('Failed to fetch notification alerts');
                 const data = await response.json();
-                const criticalAlerts = data.alerts.filter(alert => 
-                    alert.status === 'Overdue' || alert.days_until_maintenance <= 2
-                );
                 
-                // Update notification badge
-                const notificationBadge = document.getElementById('notification-badge');
-                const notificationCount = document.getElementById('notification-count');
+                const criticalAlerts = data.alerts.filter(alert => alert.days_until_maintenance <= 2);
+                const count = criticalAlerts.length;
                 
-                if (criticalAlerts.length > 0) {
-                    notificationCount.textContent = criticalAlerts.length;
+                if (count > 0) {
+                    notificationCount.textContent = count;
                     notificationBadge.classList.remove('d-none');
                 } else {
                     notificationBadge.classList.add('d-none');
                 }
+            } catch (error) {
+                console.error('Error checking notifications:', error);
+                notificationBadge.classList.add('d-none');
+            }
+        }
+        
+        async function loadNotifications() {
+            notificationList.innerHTML = '<div class="list-group-item">Carregando...</div>'; // Translated
+            try {
+                const response = await fetch(`${apiBaseUrl}/alerts?days_threshold=2`); // Check alerts due in 2 days or overdue
+                if (!response.ok) throw new Error('Failed to fetch notification alerts');
+                const data = await response.json();
                 
-                // Update notification dropdown
-                const notificationList = document.getElementById('notification-list');
-                notificationList.innerHTML = '';
+                const criticalAlerts = data.alerts.filter(alert => alert.days_until_maintenance <= 2);
+                notificationList.innerHTML = ''; // Clear loading message
                 
                 if (criticalAlerts.length === 0) {
-                    const emptyItem = document.createElement('div');
-                    emptyItem.className = 'list-group-item';
-                    emptyItem.textContent = 'Não há alertas críticos';
-                    notificationList.appendChild(emptyItem);
+                    notificationList.innerHTML = '<div class="list-group-item text-muted text-center p-3">Nenhuma notificação crítica</div>'; // Translated
                 } else {
                     criticalAlerts.forEach(alert => {
                         const item = document.createElement('a');
-                        item.className = 'list-group-item list-group-item-action';
                         item.href = '#';
+                        item.classList.add('list-group-item', 'list-group-item-action');
+                        item.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            showAlerts(); // Navigate to alerts page
+                            notificationDropdown.classList.add('d-none'); // Close dropdown
+                        });
                         
-                        const statusClass = alert.status === 'Overdue' ? 'text-danger' : 'text-warning';
-                        const statusText = alert.status === 'Overdue' ? 'Atrasado' : 'Em breve';
+                        const statusText = alert.days_until_maintenance < 0 ? 'Atrasado' : `Vence em ${alert.days_until_maintenance} dia(s)`;
+                        const statusClass = alert.days_until_maintenance < 0 ? 'text-danger' : 'text-warning';
                         
                         item.innerHTML = `
                             <div class="d-flex w-100 justify-content-between">
@@ -1238,13 +935,23 @@
                                 <small class="${statusClass}">${statusText}</small>
                             </div>
                             <p class="mb-1">Manutenção: ${alert.maintenance_date}</p>
-                            <small>Telefone: ${alert.customer_phone}</small>
-                        `;
-                        
-                        item.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            showAlerts();
-                            // Highlight this specific alert somehow
+                            <small class="text-muted">Telefone: ${alert.customer_phone}</small>
+                        `; // Translated
+                        notificationList.appendChild(item);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+                notificationList.innerHTML = '<div class="list-group-item text-danger">Erro ao carregar notificações</div>'; // Translated
+            }
+        }
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>                           // Highlight this specific alert somehow
                         });
                         
                         notificationList.appendChild(item);
