@@ -9,6 +9,7 @@ from src.routes.user import user_bp
 from src.routes.customer import customer_bp
 from src.routes.alert import alert_bp
 from src.config import SECRET_KEY, DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME, DEBUG
+from src.models.user import User
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -27,6 +28,11 @@ with app.app_context():
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
+    # Verifica se há usuários registrados no banco de dados
+    if User.query.count() == 0:
+        # Redireciona para a página de registro se não houver usuários
+        return redirect(url_for('register_page'))
+    
     static_folder_path = app.static_folder
     if static_folder_path is None:
             return "Static folder not configured", 404
@@ -43,3 +49,18 @@ def serve(path):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+@app.route('/register')
+def register_page():
+    return """
+    <h1>Criar Primeiro Usuário</h1>
+    <form action="/api/auth/register" method="POST">
+        <label for="username">Nome de Usuário:</label><br>
+        <input type="text" id="username" name="username" required><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br>
+        <label for="password">Senha:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+        <button type="submit">Registrar</button>
+    </form>
+    """

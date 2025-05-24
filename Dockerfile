@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Install system dependencies required for mysqlclient and netcat
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    default-libmysqlclient-dev build-essential netcat && \
+    default-libmysqlclient-dev build-essential netcat-openbsd && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy the requirements file into the container at /app
