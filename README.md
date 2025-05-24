@@ -1,8 +1,10 @@
-# i9Robótica - Sistema de Gestão de Clientes e Alertas de Manutenção
+# i9Robótica - Sistema de Gestão de Clientes e Alertas de Manutenção (Protótipo Aberto)
 
 ## Visão Geral do Projeto
 
-Este projeto é um sistema web desenvolvido para a i9Robótica, uma microempresa especializada na instalação de sistemas repelentes de pombos baseados em campos eletromagnéticos. O sistema visa automatizar o gerenciamento de dados de clientes e o envio de alertas de manutenção preventiva, substituindo processos manuais e melhorando a eficiência operacional.
+Este projeto é um protótipo de sistema web desenvolvido para a i9Robótica, uma microempresa especializada na instalação de sistemas repelentes de pombos baseados em campos eletromagnéticos. O sistema visa automatizar o gerenciamento de dados de clientes e o envio de alertas de manutenção preventiva, substituindo processos manuais e melhorando a eficiência operacional.
+
+**Importante:** Esta versão do protótipo **não possui sistema de login ou autenticação**. O acesso é direto e aberto após a inicialização.
 
 ## Funcionalidades Principais
 
@@ -14,8 +16,6 @@ Este projeto é um sistema web desenvolvido para a i9Robótica, uma microempresa
     *   Filtro de alertas por período (7, 14, 21, 30, 60, 90 dias).
     *   Definição de período de alerta personalizado por cliente no momento do cadastro/edição.
     *   Notificações visuais (ícone de sino) para alertas críticos (vencidos ou a vencer em 2 dias).
-*   **Autenticação de Usuários:** Sistema de login seguro para funcionários.
-*   **Gestão de Usuários:** Administradores podem criar, editar e excluir contas de usuários.
 *   **Script de Notificação por Email:** Um script (localizado em `scripts/send_maintenance_alerts.py`) pode ser configurado para verificar e enviar emails de alerta para a equipe (requer configuração de servidor SMTP).
 
 ## Tecnologias Utilizadas
@@ -42,7 +42,7 @@ Este projeto é um sistema web desenvolvido para a i9Robótica, uma microempresa
 
 3.  **Revise as Variáveis de Ambiente (Opcional mas Recomendado):**
     *   Abra o arquivo `docker-compose.yml`.
-    *   **É altamente recomendado alterar os valores padrão** para `MYSQL_ROOT_PASSWORD`, `DB_PASSWORD` e `SECRET_KEY` por questões de segurança.
+    *   **É recomendado alterar os valores padrão** para `MYSQL_ROOT_PASSWORD` e `DB_PASSWORD` por questões de segurança do banco de dados.
     *   Se planeja usar o envio de emails, configure as variáveis de ambiente relacionadas ao SMTP ( `SMTP_SERVER`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `DEFAULT_SENDER`) no `docker-compose.yml` na seção `environment` do serviço `app`.
 
 4.  **Construa as Imagens e Inicie os Containers:**
@@ -60,14 +60,7 @@ Este projeto é um sistema web desenvolvido para a i9Robótica, uma microempresa
 5.  **Acesse a Aplicação:**
     Abra seu navegador e acesse: `http://localhost:5000`
     (Se estiver rodando em um servidor remoto, substitua `localhost` pelo IP ou domínio do servidor).
-
-6.  **Primeiro Login (Administrador):**
-    *   O sistema não possui um usuário padrão.
-    *   O **primeiro usuário a se registrar** através da API (ou se a funcionalidade de registro for reativada na interface) será automaticamente definido como **administrador**.
-    *   Atualmente, o registro pela interface está desativado. Novos usuários devem ser criados pelo administrador logado, na seção "Usuários". Para criar o primeiro admin, você pode:
-        *   Temporariamente reativar o registro na interface (não recomendado para produção).
-        *   Usar uma ferramenta de API (como Postman ou curl) para fazer uma requisição POST para `/api/auth/register` com os dados do primeiro usuário (definindo `is_admin: true` no corpo JSON).
-        *   Conectar-se diretamente ao banco de dados Docker e inserir o primeiro usuário na tabela `user`.
+    *   O acesso é direto, sem necessidade de login.
 
 ## Executando o Script de Alerta por Email
 
@@ -111,8 +104,8 @@ Isso irá parar e remover os containers, mas os dados do banco de dados persisti
 |   |-- __init__.py
 |   |-- main.py            # Ponto de entrada da aplicação Flask
 |   |-- config.py          # Configurações (lê variáveis de ambiente)
-|   |-- /models            # Modelos SQLAlchemy (User, Customer)
-|   |-- /routes            # Rotas/Blueprints da API Flask
+|   |-- /models            # Modelos SQLAlchemy (Customer)
+|   |-- /routes            # Rotas/Blueprints da API Flask (Customer, Alert)
 |   |-- /static            # Arquivos estáticos (HTML, CSS, JS do frontend)
 |       |-- index.html
 |-- /scripts               # Scripts auxiliares

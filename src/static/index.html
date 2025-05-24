@@ -74,36 +74,10 @@
     </style>
 </head>
 <body>
-    <div id="login-page" class="container">
-        <div class="login-container">
-            <div class="card">
-                <div class="card-header text-center">
-                    <h3>i9Robótica</h3>
-                    <p class="mb-0">Sistema de Gestão de Clientes</p>
-                </div>
-                <div class="card-body">
-                    <form id="login-form">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Usuário</label>
-                            <input type="text" class="form-control" id="username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Senha</label>
-                            <input type="password" class="form-control" id="password" required>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">Entrar</button>
-                        </div>
-                    </form>
-                    <div class="alert alert-danger mt-3 d-none" id="login-error">
-                        Usuário ou senha inválidos
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div id="app" class="d-none">
+
+    <div id="app" class="">
+        <nav class="navbar navbar-expand-lg navbar-dark mb-4">
         <nav class="navbar navbar-expand-lg navbar-dark mb-4">
             <div class="container">
                 <a class="navbar-brand" href="#">i9Robótica</a>
@@ -121,10 +95,11 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#" id="alerts-link">Alertas de Manutenção</a>
                         </li>
-                        <li class="nav-item admin-only">
+                        <!-- <li class="nav-item admin-only">
                             <a class="nav-link" href="#" id="users-link">Usuários</a>
-                        </li>
+                        </li> -->
                     </ul>
+                    <!-- User info and logout removed -->
                     <div class="d-flex">
                         <div class="position-relative me-3">
                             <button class="btn btn-link text-white position-relative" id="notification-bell">
@@ -140,8 +115,8 @@
                                 </div>
                             </div>
                         </div>
-                        <span class="navbar-text me-3" id="user-info">Bem-vindo, Usuário</span>
-                        <button class="btn btn-outline-light btn-sm" id="logout-btn">Sair</button>
+                        <!-- <span class="navbar-text me-3" id="user-info">Bem-vindo, Usuário</span> -->
+                        <!-- <button class="btn btn-outline-light btn-sm" id="logout-btn">Sair</button> -->
                     </div>
                 </div>
             </div>
