@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>i9Robótica - Gestão de Clientes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #343a40;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            border-radius: 10px 10px 0 0;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+            color: #856404;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+        .dashboard-stats {
+            text-align: center;
+            padding: 20px;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-page" class="container">
+        <div class="login-container">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3>i9Robótica</h3>
+                    <p class="mb-0">Sistema de Gestão de Clientes</p>
+                </div>
+                <div class="card-body">
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Usuário</label>
+                            <input type="text" class="form-control" id="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Senha</label>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Entrar</button>
+                        </div>
+                    </form>
+                    <div class="alert alert-danger mt-3 d-none" id="login-error">
+                        Usuário ou senha inválidos
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app" class="d-none">
+        <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+            <div class="container">
+                <a class="navbar-brand" href="#">i9Robótica</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="dashboard-link">Painel</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="customers-link">Clientes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="alerts-link">Alertas de Manutenção</a>
+                        </li>
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="#" id="users-link">Usuários</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex">
+                        <div class="position-relative me-3">
+                            <button class="btn btn-link text-white position-relative" id="notification-bell">
+                                <i class="bi bi-bell-fill fs-5"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" id="notification-badge">
+                                    <span id="notification-count">0</span>
+                                    <span class="visually-hidden">alertas não lidos</span>
+                                </span>
+                            </button>
+                            <div class="position-absolute dropdown-menu dropdown-menu-end p-0 d-none" id="notification-dropdown" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                                <div class="list-group list-group-flush" id="notification-list">
+                                    <!-- Notificações serão adicionadas aqui -->
+                                </div>
+                            </div>
+                        </div>
+                        <span class="navbar-text me-3" id="user-info">Bem-vindo, Usuário</span>
+                        <button class="btn btn-outline-light btn-sm" id="logout-btn">Sair</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container" id="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard-page">
+                <h2 class="mb-4">Painel</h2>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card dashboard-stats">
+                            <div class="stat-value" id="total-customers">0</div>
+                            <div class="stat-label">Total de Clientes</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card dashboard-stats">
+                            <div class="stat-value" id="overdue-maintenance">0</div>
+                            <div class="stat-label">Manutenções Atrasadas</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card dashboard-stats">
+                            <div class="stat-value" id="due-7days">0</div>
+                            <div class="stat-label">Vencendo em 7 Dias</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card dashboard-stats">
+                            <div class="stat-value" id="due-30days">0</div>
+                            <div class="stat-label">Vencendo em 30 Dias</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">Alertas de Manutenção Recentes</div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Telefone</th>
+                                        <th>Data de Instalação</th>
+                                        <th>Data de Manutenção</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-alerts-table">
+                                    <!-- Alerts will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers Page -->
+            <div id="customers-page" class="d-none">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Gestão de Clientes</h2>
+                    <button class="btn btn-primary" id="add-customer-btn">Adicionar Novo Cliente</button>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">Filtros de Busca</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="name-filter" class="form-label">Nome do Cliente</label>
+                                    <input type="text" class="form-control" id="name-filter">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="start-date-filter" class="form-label">Data Inicial</label>
+                                    <input type="date" class="form-control" id="start-date-filter">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="end-date-filter" class="form-label">Data Final</label>
+                                    <input type="date" class="form-control" id="end-date-filter">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button class="btn btn-primary" id="apply-filters-btn">Aplicar Filtros</button>
+                            <button class="btn btn-secondary" id="clear-filters-btn">Limpar Filtros</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Lista de Clientes</div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Endereço</th>
+                                        <th>Telefone</th>
+                                        <th>Data de Instalação</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customers-table">
+                                    <!-- Customers will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts Page -->
+            <div id="alerts-page" class="d-none">
+                <h2 class="mb-4">Alertas de Manutenção</h2>
+
+                <div class="card mb-4">
+                    <div class="card-header">Filtros de Alerta</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="days-threshold" class="form-label">Limite de Dias</label>
+                                    <select class="form-select" id="days-threshold">
+                                        <option value="7">7 dias</option>
+                                        <option value="14">14 dias</option>
+                                        <option value="21">21 dias</option>
+                                        <option value="30" selected>30 dias</option>
+                                        <option value="60">60 dias</option>
+                                        <option value="90">90 dias</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="alert-start-date" class="form-label">Data Inicial</label>
+                                    <input type="date" class="form-control" id="alert-start-date">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="alert-end-date" class="form-label">Data Final</label>
+                                    <input type="date" class="form-control" id="alert-end-date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button class="btn btn-primary" id="apply-alert-filters-btn">Aplicar Filtros</button>
+                            <button class="btn btn-secondary" id="clear-alert-filters-btn">Limpar Filtros</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Lista de Alertas de Manutenção</div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Telefone</th>
+                                        <th>Data de Instalação</th>
+                                        <th>Data de Manutenção</th>
+                                        <th>Dias Restantes</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="alerts-table">
+                                    <!-- Alerts will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Page -->
+            <div id="users-page" class="d-none admin-only">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Gestão de Usuários</h2>
+                    <button class="btn btn-primary" id="add-user-btn">Adicionar Novo Usuário</button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Lista de Usuários</div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Usuário</th>
+                                        <th>Email</th>
+                                        <th>Função</th>
+                                        <th>Criado em</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table">
+                                    <!-- Users will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Modal -->
+        <div class="modal fade" id="customer-modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="customer-modal-title">Adicionar Novo Cliente</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="customer-form">
+                            <input type="hidden" id="customer-id">
+                            <div class="mb-3">
+                                <label for="customer-name" class="form-label">Nome</label>
+                                <input type="text" class="form-control" id="customer-name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="customer-address" class="form-label">Endereço</label>
+                                <input type="text" class="form-control" id="customer-address" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="customer-phone" class="form-label">Telefone</label>
+                                <input type="text" class="form-control" id="customer-phone" required>
+                            </div>
+                              <div class="mb-3">
+                            <label for="customer-installation-date" class="form-label">Data de Instalação</label>
+                            <input type="date" class="form-control" id="customer-installation-date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="customer-alert-days" class="form-label">Período de Alerta</label>
+                            <select class="form-select" id="customer-alert-days" required>
+                                <option value="7">7 dias</option>
+                                <option value="14">14 dias</option>
+                                <option value="21">21 dias</option>
+                                <option value="30" selected>30 dias</option>
+                                <option value="60">60 dias</option>
+                                <option value="90">90 dias</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary" id="save-customer-btn">Salvar</button>
+                        </div>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Modal -->
+        <div class="modal fade" id="user-modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="user-modal-title">Adicionar Novo Usuário</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="user-form">
+                            <input type="hidden" id="user-id">
+                            <div class="mb-3">
+                                <label for="user-username" class="form-label">Usuário</label>
+                                <input type="text" class="form-control" id="user-username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="user-email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="user-email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="user-password" class="form-label">Senha</label>
+                                <input type="password" class="form-control" id="user-password">
+                                <small class="form-text text-muted" id="password-hint">Deixe em branco para manter a senha atual</small>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="user-is-admin">
+                                <label class="form-check-label" for="user-is-admin">Usuário Administrador</label>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="save-user-btn">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal fade" id="delete-modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmar Exclusão</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="delete-message">Tem certeza que deseja excluir este item?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="confirm-delete-btn">Excluir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>i9Robótica Sistema de Gestão de Clientes &copy; 2025</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let currentUser = null;
+        let token = null;
+        const apiBaseUrl = '/api';
+        
+        // DOM Elements
+        const loginPage = document.getElementById('login-page');
+        const appPage = document.getElementById('app');
+        const dashboardPage = document.getElementById('dashboard-page');
+        const customersPage = document.getElementById('customers-page');
+        const alertsPage = document.getElementById('alerts-page');
+        const usersPage = document.getElementById('users-page');
+        
+        // Modals
+        const customerModal = new bootstrap.Modal(document.getElementById('customer-modal'));
+        const userModal = new bootstrap.Modal(document.getElementById('user-modal'));
+        const deleteModal = new bootstrap.Modal(document.getElementById('delete-modal'));
+        
+        // Event Listeners
+        document.getElementById('login-form').addEventListener('submit', handleLogin);
+        // Removido o listener do formulário de registro que não existe mais
+        document.getElementById('logout-btn').addEventListener('click', handleLogout);
+        
+        // Navegação principal
+        document.getElementById('dashboard-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            showDashboard();
+        });
+        
+        document.getElementById('customers-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            showCustomers();
+        });
+        
+        document.getElementById('alerts-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            showAlerts();
+        });
+        
+        document.getElementById('users-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            showUsers();
+        });
+        
+        // Outros botões
+        document.getElementById('add-customer-btn').addEventListener('click', showAddCustomerModal);
+        document.getElementById('add-user-btn').addEventListener('click', showAddUserModal);
+        document.getElementById('save-customer-btn').addEventListener('click', saveCustomer);
+        document.getElementById('save-user-btn').addEventListener('click', saveUser);
+        document.getElementById('apply-filters-btn').addEventListener('click', loadCustomers);
+        document.getElementById('clear-filters-btn').addEventListener('click', clearCustomerFilters);
+        document.getElementById('apply-alert-filters-btn').addEventListener('click', loadAlerts);
+        document.getElementById('clear-alert-filters-btn').addEventListener('click', clearAlertFilters);
+        
+        // Check for existing token in localStorage
+        function initApp() {
+            token = localStorage.getItem('token');
+            if (token) {
+                fetchCurrentUser()
+                    .then(() => {
+                        showApp();
+                        showDashboard();
+                        // Check for notifications on app init
+                        checkNotifications();
+                    })
+                    .catch(() => {
+                        // Token invalid or expired
+                        localStorage.removeItem('token');
+                        showLogin();
+                    });
+            } else {
+                showLogin();
+            }
+        }
+        
+        // Authentication Functions
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${apiBaseUrl}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Falha no login');
+                }
+                
+                const data = await response.json();
+                token = data.token;
+                currentUser = data.user;
+                
+                // Save token to localStorage
+                localStorage.setItem('token', token);
+                
+                // Show app
+                showApp();
+                showDashboard();
+                
+            } catch (error) {
+                document.getElementById('login-error').classList.remove('d-none');
+            }
+        }
+        
+        function handleLogout() {
+            // Clear token and user data
+            localStorage.removeItem('token');
+            token = null;
+            currentUser = null;
+            
+            // Show login page
+            showLogin();
+        }
+        
+        async function fetchCurrentUser() {
+            const response = await fetch(`${apiBaseUrl}/auth/profile`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch user profile');
+            }
+            
+            const data = await response.json();
+            currentUser = data.user;
+            updateUserInfo();
+        }
+        
+        // UI Functions
+        function showLogin() {
+            loginPage.classList.remove('d-none');
+            appPage.classList.add('d-none');
+            document.getElementById('login-form').reset();
+            document.getElementById('login-error').classList.add('d-none');
+        }
+        
+        function showApp() {
+            loginPage.classList.add('d-none');
+            appPage.classList.remove('d-none');
+            updateUserInfo();
+            updateAdminElements();
+        }
+        
+        function updateUserInfo() {
+            if (currentUser) {
+                document.getElementById('user-info').textContent = `Bem-vindo, ${currentUser.username}`;
+            }
+        }
+        
+        function updateAdminElements() {
+            const adminElements = document.querySelectorAll('.admin-only');
+            if (currentUser && currentUser.is_admin) {
+                adminElements.forEach(el => el.classList.remove('d-none'));
+            } else {
+                adminElements.forEach(el => el.classList.add('d-none'));
+            }
+        }
+        
+        function showDashboard() {
+            dashboardPage.classList.remove('d-none');
+            customersPage.classList.add('d-none');
+            alertsPage.classList.add('d-none');
+            usersPage.classList.add('d-none');
+            
+            loadDashboardData();
+        }
+        
+        function showCustomers() {
+            dashboardPage.classList.add('d-none');
+            customersPage.classList.remove('d-none');
+            alertsPage.classList.add('d-none');
+            usersPage.classList.add('d-none');
+            
+            loadCustomers();
+        }
+        
+        function showAlerts() {
+            dashboardPage.classList.add('d-none');
+            customersPage.classList.add('d-none');
+            alertsPage.classList.remove('d-none');
+            usersPage.classList.add('d-none');
+            
+            loadAlerts();
+        }
+        
+        function showUsers() {
+            dashboardPage.classList.add('d-none');
+            customersPage.classList.add('d-none');
+            alertsPage.classList.add('d-none');
+            usersPage.classList.remove('d-none');
+            
+            loadUsers();
+        }
+        
+        // Data Loading Functions
+        async function loadDashboardData() {
+            try {
+                // Load summary data
+                const summaryResponse = await fetch(`${apiBaseUrl}/alerts/summary`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!summaryResponse.ok) {
+                    throw new Error('Failed to load summary data');
+                }
+                
+                const summaryData = await summaryResponse.json();
+                
+                // Update dashboard stats
+                document.getElementById('total-customers').textContent = summaryData.total_customers;
+                document.getElementById('overdue-maintenance').textContent = summaryData.maintenance_overdue;
+                document.getElementById('due-7days').textContent = summaryData.maintenance_due_7days;
+                document.getElementById('due-30days').textContent = summaryData.maintenance_due_30days;
+                
+                // Load recent alerts
+                const alertsResponse = await fetch(`${apiBaseUrl}/alerts?days_threshold=30`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!alertsResponse.ok) {
+                    throw new Error('Failed to load alerts');
+                }
+                
+                const alertsData = await alertsResponse.json();
+                
+                // Update recent alerts table
+                const alertsTable = document.getElementById('recent-alerts-table');
+                alertsTable.innerHTML = '';
+                
+                if (alertsData.alerts.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="5" class="text-center">No alerts found</td>';
+                    alertsTable.appendChild(row);
+                } else {
+                    // Show only the first 5 alerts
+                    const alerts = alertsData.alerts.slice(0, 5);
+                    
+                    alerts.forEach(alert => {
+                        const row = document.createElement('tr');
+                        const statusClass = alert.status === 'Overdue' ? 'text-danger' : 'text-warning';
+                        
+                        row.innerHTML = `
+                            <td>${alert.customer_name}</td>
+                            <td>${alert.customer_phone}</td>
+                            <td>${alert.installation_date}</td>
+                            <td>${alert.maintenance_date}</td>
+                            <td class="${statusClass}">${alert.status}</td>
+                        `;
+                        
+                        alertsTable.appendChild(row);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+        
+        async function loadCustomers() {
+            try {
+                // Get filter values
+                const nameFilter = document.getElementById('name-filter').value;
+                const startDate = document.getElementById('start-date-filter').value;
+                const endDate = document.getElementById('end-date-filter').value;
+                
+                // Build query string
+                let queryParams = [];
+                if (nameFilter) queryParams.push(`name=${encodeURIComponent(nameFilter)}`);
+                if (startDate) queryParams.push(`start_date=${startDate}`);
+                if (endDate) queryParams.push(`end_date=${endDate}`);
+                
+                const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+                
+                // Fetch customers
+                const response = await fetch(`${apiBaseUrl}/customers${queryString}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load customers');
+                }
+                
+                const data = await response.json();
+                
+                // Update customers table
+                const customersTable = document.getElementById('customers-table');
+                customersTable.innerHTML = '';
+                
+                if (data.customers.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="5" class="text-center">No customers found</td>';
+                    customersTable.appendChild(row);
+                } else {
+                    data.customers.forEach(customer => {
+                        const row = document.createElement('tr');
+                        
+                        row.innerHTML = `
+                            <td>${customer.name}</td>
+                            <td>${customer.address}</td>
+                            <td>${customer.phone}</td>
+                            <td>${customer.installation_date}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary edit-customer" data-id="${customer.id}">Edit</button>
+                                <button class="btn btn-sm btn-danger delete-customer" data-id="${customer.id}">Delete</button>
+                            </td>
+                        `;
+                        
+                        customersTable.appendChild(row);
+                    });
+                    
+                    // Add event listeners to buttons
+                    document.querySelectorAll('.edit-customer').forEach(btn => {
+                        btn.addEventListener('click', () => showEditCustomerModal(btn.dataset.id));
+                    });
+                    
+                    document.querySelectorAll('.delete-customer').forEach(btn => {
+                        btn.addEventListener('click', () => showDeleteCustomerModal(btn.dataset.id));
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error loading customers:', error);
+            }
+        }
+        
+        function clearCustomerFilters() {
+            document.getElementById('name-filter').value = '';
+            document.getElementById('start-date-filter').value = '';
+            document.getElementById('end-date-filter').value = '';
+            loadCustomers();
+        }
+        
+        async function loadAlerts() {
+            try {
+                // Get filter values
+                const daysThreshold = document.getElementById('days-threshold').value;
+                const startDate = document.getElementById('alert-start-date').value;
+                const endDate = document.getElementById('alert-end-date').value;
+                
+                // Build query string
+                let queryParams = [];
+                if (daysThreshold) queryParams.push(`days_threshold=${daysThreshold}`);
+                if (startDate) queryParams.push(`start_date=${startDate}`);
+                if (endDate) queryParams.push(`end_date=${endDate}`);
+                
+                const queryString = queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+                
+                // Fetch alerts
+                const response = await fetch(`${apiBaseUrl}/alerts${queryString}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load alerts');
+                }
+                
+                const data = await response.json();
+                
+                // Update alerts table
+                const alertsTable = document.getElementById('alerts-table');
+                alertsTable.innerHTML = '';
+                
+                if (data.alerts.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="6" class="text-center">No alerts found</td>';
+                    alertsTable.appendChild(row);
+                } else {
+                    data.alerts.forEach(alert => {
+                        const row = document.createElement('tr');
+                        const statusClass = alert.status === 'Overdue' ? 'text-danger' : 'text-warning';
+                        
+                        row.innerHTML = `
+                            <td>${alert.customer_name}</td>
+                            <td>${alert.customer_phone}</td>
+                            <td>${alert.installation_date}</td>
+                            <td>${alert.maintenance_date}</td>
+                            <td>${alert.days_until_maintenance}</td>
+                            <td class="${statusClass}">${alert.status}</td>
+                        `;
+                        
+                        alertsTable.appendChild(row);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+            }
+        }
+        
+        function clearAlertFilters() {
+            document.getElementById('days-threshold').value = '30';
+            document.getElementById('alert-start-date').value = '';
+            document.getElementById('alert-end-date').value = '';
+            loadAlerts();
+        }
+        
+        async function loadUsers() {
+            if (!currentUser || !currentUser.is_admin) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${apiBaseUrl}/users`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load users');
+                }
+                
+                const data = await response.json();
+                
+                // Update users table
+                const usersTable = document.getElementById('users-table');
+                usersTable.innerHTML = '';
+                
+                if (data.users.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="5" class="text-center">No users found</td>';
+                    usersTable.appendChild(row);
+                } else {
+                    data.users.forEach(user => {
+                        const row = document.createElement('tr');
+                        
+                        row.innerHTML = `
+                            <td>${user.username}</td>
+                            <td>${user.email}</td>
+                            <td>${user.is_admin ? 'Admin' : 'User'}</td>
+                            <td>${user.created_at}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary edit-user" data-id="${user.id}">Edit</button>
+                                <button class="btn btn-sm btn-danger delete-user" data-id="${user.id}">Delete</button>
+                            </td>
+                        `;
+                        
+                        usersTable.appendChild(row);
+                    });
+                    
+                    // Add event listeners to buttons
+                    document.querySelectorAll('.edit-user').forEach(btn => {
+                        btn.addEventListener('click', () => showEditUserModal(btn.dataset.id));
+                    });
+                    
+                    document.querySelectorAll('.delete-user').forEach(btn => {
+                        btn.addEventListener('click', () => showDeleteUserModal(btn.dataset.id));
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+        
+        // Customer Modal Functions
+        function showAddCustomerModal() {
+            document.getElementById('customer-modal-title').textContent = 'Add New Customer';
+            document.getElementById('customer-form').reset();
+            document.getElementById('customer-id').value = '';
+            
+            // Set today as default installation date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('customer-installation-date').value = today;
+            
+            customerModal.show();
+        }
+        
+        async function showEditCustomerModal(customerId) {
+            try {
+                const response = await fetch(`${apiBaseUrl}/customers/${customerId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load customer details');
+                }
+                
+                const data = await response.json();
+                const customer = data.customer;
+                
+                document.getElementById('customer-modal-title').textContent = 'Edit Customer';
+                document.getElementById('customer-id').value = customer.id;
+                document.getElementById('customer-name').value = customer.name;
+                document.getElementById('customer-address').value = customer.address;
+                document.getElementById('customer-phone').value = customer.phone;
+                document.getElementById('customer-installation-date').value = customer.installation_date;
+                
+                // Set alert days dropdown value
+                const alertDaysSelect = document.getElementById('customer-alert-days');
+                if (customer.alert_days) {
+                    // Find the option with matching value
+                    const option = Array.from(alertDaysSelect.options).find(opt => parseInt(opt.value) === customer.alert_days);
+                    if (option) {
+                        alertDaysSelect.value = option.value;
+                    } else {
+                        // Default to 30 days if no match
+                        alertDaysSelect.value = '30';
+                    }
+                } else {
+                    // Default to 30 days if not set
+                    alertDaysSelect.value = '30';
+                }
+                
+                customerModal.show();
+                
+            } catch (error) {
+                console.error('Error loading customer details:', error);
+            }
+        }
+        
+        async function saveCustomer() {
+            const customerId = document.getElementById('customer-id').value;
+            const isNewCustomer = !customerId;
+            
+            const customerData = {
+                name: document.getElementById('customer-name').value,
+                address: document.getElementById('customer-address').value,
+                phone: document.getElementById('customer-phone').value,
+                installation_date: document.getElementById('customer-installation-date').value,
+                alert_days: parseInt(document.getElementById('customer-alert-days').value)
+            };
+            
+            try {
+                let url = `${apiBaseUrl}/customers`;
+                let method = 'POST';
+                
+                if (!isNewCustomer) {
+                    url = `${apiBaseUrl}/customers/${customerId}`;
+                    method = 'PUT';
+                }
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(customerData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save customer');
+                }
+                
+                // Close modal and reload customers
+                customerModal.hide();
+                loadCustomers();
+                
+                // Reload dashboard if we're adding/editing a customer
+                if (document.getElementById('dashboard-page').classList.contains('d-none') === false) {
+                    loadDashboardData();
+                }
+                
+                // Check notifications after adding/editing a customer
+                checkNotifications();
+                
+            } catch (error) {
+                console.error('Error saving customer:', error);
+            }
+        }
+        
+        function showDeleteCustomerModal(customerId) {
+            document.getElementById('delete-message').textContent = 'Are you sure you want to delete this customer?';
+            
+            // Set up delete confirmation button
+            const confirmButton = document.getElementById('confirm-delete-btn');
+            confirmButton.onclick = async () => {
+                try {
+                    const response = await fetch(`${apiBaseUrl}/customers/${customerId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to delete customer');
+                    }
+                    
+                    // Close modal and reload customers
+                    deleteModal.hide();
+                    loadCustomers();
+                    
+                    // Reload dashboard if we're on the dashboard
+                    if (document.getElementById('dashboard-page').classList.contains('d-none') === false) {
+                        loadDashboardData();
+                    }
+                    
+                } catch (error) {
+                    console.error('Error deleting customer:', error);
+                }
+            };
+            
+            deleteModal.show();
+        }
+        
+        // User Modal Functions
+        function showAddUserModal() {
+            document.getElementById('user-modal-title').textContent = 'Add New User';
+            document.getElementById('user-form').reset();
+            document.getElementById('user-id').value = '';
+            document.getElementById('password-hint').classList.add('d-none');
+            document.getElementById('user-password').required = true;
+            
+            userModal.show();
+        }
+        
+        async function showEditUserModal(userId) {
+            try {
+                const response = await fetch(`${apiBaseUrl}/users/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load user details');
+                }
+                
+                const data = await response.json();
+                const user = data.user;
+                
+                document.getElementById('user-modal-title').textContent = 'Edit User';
+                document.getElementById('user-id').value = user.id;
+                document.getElementById('user-username').value = user.username;
+                document.getElementById('user-email').value = user.email;
+                document.getElementById('user-is-admin').checked = user.is_admin;
+                document.getElementById('user-password').value = '';
+                document.getElementById('user-password').required = false;
+                document.getElementById('password-hint').classList.remove('d-none');
+                
+                userModal.show();
+                
+            } catch (error) {
+                console.error('Error loading user details:', error);
+            }
+        }
+        
+        async function saveUser() {
+            const userId = document.getElementById('user-id').value;
+            const isNewUser = !userId;
+            
+            const userData = {
+                username: document.getElementById('user-username').value,
+                email: document.getElementById('user-email').value,
+                is_admin: document.getElementById('user-is-admin').checked
+            };
+            
+            // Only include password if it's provided
+            const password = document.getElementById('user-password').value;
+            if (password) {
+                userData.password = password;
+            }
+            
+            try {
+                let url = `${apiBaseUrl}/auth/register`;
+                let method = 'POST';
+                
+                if (!isNewUser) {
+                    url = `${apiBaseUrl}/users/${userId}`;
+                    method = 'PUT';
+                }
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save user');
+                }
+                
+                // Close modal and reload users
+                userModal.hide();
+                loadUsers();
+                
+            } catch (error) {
+                console.error('Error saving user:', error);
+            }
+        }
+        
+        function showDeleteUserModal(userId) {
+            document.getElementById('delete-message').textContent = 'Are you sure you want to delete this user?';
+            
+            // Set up delete confirmation button
+            const confirmButton = document.getElementById('confirm-delete-btn');
+            confirmButton.onclick = async () => {
+                try {
+                    const response = await fetch(`${apiBaseUrl}/users/${userId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to delete user');
+                    }
+                    
+                    // Close modal and reload users
+                    deleteModal.hide();
+                    loadUsers();
+                    
+                } catch (error) {
+                    console.error('Error deleting user:', error);
+                }
+            };
+            
+            deleteModal.show();
+        }
+        
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', initApp);
+        
+        // Notification Functions
+        async function checkNotifications() {
+            try {
+                // Fetch alerts that are overdue or due within 2 days
+                const response = await fetch(`${apiBaseUrl}/alerts?days_threshold=2`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load notifications');
+                }
+                
+                const data = await response.json();
+                const criticalAlerts = data.alerts.filter(alert => 
+                    alert.status === 'Overdue' || alert.days_until_maintenance <= 2
+                );
+                
+                // Update notification badge
+                const notificationBadge = document.getElementById('notification-badge');
+                const notificationCount = document.getElementById('notification-count');
+                
+                if (criticalAlerts.length > 0) {
+                    notificationCount.textContent = criticalAlerts.length;
+                    notificationBadge.classList.remove('d-none');
+                } else {
+                    notificationBadge.classList.add('d-none');
+                }
+                
+                // Update notification dropdown
+                const notificationList = document.getElementById('notification-list');
+                notificationList.innerHTML = '';
+                
+                if (criticalAlerts.length === 0) {
+                    const emptyItem = document.createElement('div');
+                    emptyItem.className = 'list-group-item';
+                    emptyItem.textContent = 'Não há alertas críticos';
+                    notificationList.appendChild(emptyItem);
+                } else {
+                    criticalAlerts.forEach(alert => {
+                        const item = document.createElement('a');
+                        item.className = 'list-group-item list-group-item-action';
+                        item.href = '#';
+                        
+                        const statusClass = alert.status === 'Overdue' ? 'text-danger' : 'text-warning';
+                        const statusText = alert.status === 'Overdue' ? 'Atrasado' : 'Em breve';
+                        
+                        item.innerHTML = `
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">${alert.customer_name}</h6>
+                                <small class="${statusClass}">${statusText}</small>
+                            </div>
+                            <p class="mb-1">Manutenção: ${alert.maintenance_date}</p>
+                            <small>Telefone: ${alert.customer_phone}</small>
+                        `;
+                        
+                        item.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            showAlerts();
+                            // Highlight this specific alert somehow
+                        });
+                        
+                        notificationList.appendChild(item);
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error checking notifications:', error);
+            }
+        }
+        
+        // Toggle notification dropdown
+        document.getElementById('notification-bell').addEventListener('click', function() {
+            const dropdown = document.getElementById('notification-dropdown');
+            dropdown.classList.toggle('d-none');
+        });
+        
+        // Close notification dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const bell = document.getElementById('notification-bell');
+            const dropdown = document.getElementById('notification-dropdown');
+            
+            if (!bell.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('d-none');
+            }
+        });
+    </script>
+</body>
+</html>

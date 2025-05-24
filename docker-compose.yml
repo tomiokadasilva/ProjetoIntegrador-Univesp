@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=src.main:app
+      - FLASK_RUN_HOST=0.0.0.0
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=i9robotica_db
+      - DB_USERNAME=root
+      - DB_PASSWORD=secretpassword
+      - SECRET_KEY=a_very_secure_secret_key_please_change
+      # Add other environment variables from config.py if needed
+      # - SMTP_SERVER=
+      # - SMTP_PORT=
+      # - SMTP_USERNAME=
+      # - SMTP_PASSWORD=
+      # - DEFAULT_SENDER=
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: secretpassword
+      MYSQL_DATABASE: i9robotica_db
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+    # Optional: Expose port 3306 if you need external access to the DB
+    # ports:
+    #   - "3306:3306"
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge
+
